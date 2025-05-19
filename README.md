@@ -1,77 +1,142 @@
-Here's your updated `README.md` file — **only the README content, nothing else**:
+Here is a **proper, structured, and complete `README.md`** for your smart contract system:
 
 ---
 
-```markdown
-# 🪵 DecentrawoodAI NFT System
+````markdown
+# 🪵 DecentrawoodAI NFT Minting System
 
-DecentrawoodAI is a decentralized platform for AI-generated NFTs on the Polygon blockchain. It consists of two main smart contracts:
+A decentralized AI-powered NFT minting and marketplace system built on the Polygon network. The system uses a dual-contract setup:
 
-- `DecentrawoodAI_NFTs`: An ERC721 NFT contract
-- `Depositor`: A MATIC payment contract that acts as the exclusive minter
-
----
-
-## 📜 Contracts Overview
-
-### 🔹 `Depositor.sol`
-
-Handles MATIC-based NFT minting and manages roles and fund withdrawals.
-
-- Users mint NFTs by sending MATIC and a `tokenURI`
-- Calls the `mintNFT` function on the NFT contract
-- Roles:
-  - `developer`: Can update NFT contract, set creator, withdraw funds
-  - `creator`: Can withdraw funds
-- Emits:
-  - `DepositReceived`: On mint + deposit
-  - `CreatorWithdrawn`: On fund withdrawal
-
-### 🔹 `DecentrawoodAI_NFTs.sol`
-
-ERC721 contract with:
-
-- Minting restricted to `Depositor` contract
-- DEOD-token-based marketplace
-- 5% royalty to original minter on resale
-- ERC-2981 royalty standard support
-- Burn functionality
-- Events for minting, burning, and marketplace activity
+- **Depositor**: Handles MATIC payments, authorization, and NFT minting.
+- **DecentrawoodAI_NFTs**: An ERC721-compliant NFT contract integrated with a DEOD token-based marketplace.
 
 ---
 
-## ⚙️ Usage Flow
+## 📂 Project Structure
 
-1. User calls `depositAndMint(tokenURI)` on `Depositor` with required MATIC.
-2. `Depositor` calls `mintNFT(user, tokenURI)` on NFT contract.
-3. NFT is minted to the user’s wallet.
-4. Funds can be withdrawn by `developer` or `creator`.
-
----
-
-## 💡 Key Features
-
-- Mint NFTs with MATIC payments
-- Role-based access control (developer & creator)
-- Withdraw MATIC from contract
-- NFT trading with DEOD token
-- On-chain royalty enforcement (5%)
+- `contracts/Depositor.sol` – MATIC payment contract and minting gateway.
+- `contracts/DecentrawoodAI_NFTs.sol` – ERC721 NFT contract with integrated resale marketplace.
+- `scripts/deploy.js` – Deployment script for both contracts.
+- `README.md` – This file.
 
 ---
 
-## 🔐 Security
+## 🧩 Contract Overview
 
-- ✅ Minting limited to Depositor contract
-- ✅ ReentrancyGuard to protect fund-handling
-- ✅ Developer-controlled contract linking and upgrades
-- ✅ Creator/developer-only fund withdrawals
+### ✅ Depositor Contract
+
+A secure gateway for users to mint NFTs by sending MATIC.
+
+#### Functions:
+- `depositAndMint(string memory tokenURI)`  
+  Users call this with MATIC and a tokenURI to mint an NFT.
+  
+- `setRequiredMaticAmount(uint256 amount)`  
+  Developer or creator sets the required MATIC amount to mint.
+
+- `withdrawFunds()`  
+  Creator or developer can withdraw all collected MATIC.
+
+- `updateNFTContract(address newAddress)`  
+  Developer can update the NFT contract address.
+
+- `setCreator(address creator)`  
+  Developer assigns the creator role.
+
+- `updateDeveloper(address developer)`  
+  Developer can transfer their own role.
+
+#### Roles:
+- **Developer**: Admin role to manage contracts and ownership.
+- **Creator**: Authorized to withdraw funds.
+- **User**: Mints NFTs by sending MATIC.
+
+#### Events:
+- `DepositReceived(user, amount, tokenURI)`
+- `CreatorWithdrawn(creator, amount)`
 
 ---
 
-## 🧑‍💻 Authors
+### 🖼️ DecentrawoodAI_NFTs Contract
 
-- Mayuresh Pawar
-- Monish Nagre
+An ERC721 NFT contract supporting:
+- Minting restricted to the `Depositor` contract.
+- Resale marketplace using the DEOD token.
+- 5% royalty to the original creator.
+- Burning of owned NFTs.
+- ERC-2981 royalty support.
+
+#### Key Functions:
+- `mintNFT(address to, string memory tokenURI)`  
+  Can only be called by the Depositor contract.
+
+- `listNFT(uint256 tokenId, uint256 price)`  
+  List an NFT for sale using DEOD tokens.
+
+- `buyNFT(uint256 tokenId)`  
+  Buy a listed NFT. 5% goes to original creator, 95% to seller.
+
+- `burn(uint256 tokenId)`  
+  Burn an NFT you own.
+
+#### Events:
+- `NFTMinted(to, tokenId, tokenURI)`
+- `NFTListed(tokenId, price)`
+- `NFTSold(tokenId, buyer)`
+- `NFTBurned(tokenId)`
+- `RoyaltyPaid(creator, amount)`
+
+---
+
+## ⚙️ How It Works
+
+1. User connects their wallet and prepares a tokenURI.
+2. User sends the required MATIC to the `depositAndMint()` function on `Depositor`.
+3. `Depositor` checks MATIC amount and calls `mintNFT()` on the NFT contract.
+4. NFT is minted and assigned to the user.
+5. User can later list/sell/burn their NFTs via the NFT contract.
+
+---
+
+## 🛡️ Security Features
+
+- Uses `ReentrancyGuard` to protect against reentrancy attacks.
+- Role-based access for sensitive functions (developer & creator).
+- NFT minting is strictly restricted to the `Depositor` contract.
+- ERC-2981 support ensures standardized royalty tracking.
+
+---
+
+## 🧪 Deployment
+
+Update the deploy script (`scripts/deploy.js`) with your wallet and network info. Then run:
+
+```bash
+npx hardhat run scripts/deploy.js --network polygon
+````
+
+---
+
+## 🔐 Access Control Summary
+
+| Role      | Capabilities                                     |
+| --------- | ------------------------------------------------ |
+| Developer | Set NFT contract, assign creator, withdraw funds |
+| Creator   | Withdraw funds                                   |
+| User      | Mint NFTs with MATIC                             |
+
+---
+
+## 📢 Authors
+
+* **Mayuresh Pawar**
+* **Monish Nagre**
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
 ```
 
-Let me know if you'd like this exported to a `.md` file or included with deployment/usage examples.
