@@ -1,23 +1,28 @@
-
 const hre = require("hardhat");
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
 
-  console.log("Deploying DecentrawoodAI_NFTs with the account:", deployer.address);
-  console.log("Account balance:", (await deployer.getBalance()).toString());
+  // Deploy NFT contract
+  const DEOD_ADDRESS = "0x..."; // Set token address
+  const NFT = await hre.ethers.getContractFactory("DecentrawoodAI_NFTs");
+  const nft = await NFT.deploy(DEOD_ADDRESS);
+  await nft.deployed();
+  console.log("NFT Contract deployed to:", nft.address);
 
-  const DEOD_TOKEN_ADDRESS = ""; 
+  // Deploy Depositor contract
+  const Depositor = await hre.ethers.getContractFactory("Depositor");
+  const depositor = await Depositor.deploy(deployer.address, nft.address);
+  await depositor.deployed();
+  console.log("Depositor Contract deployed to:", depositor.address);
 
-  const NFTContractFactory = await hre.ethers.getContractFactory("DecentrawoodAI_NFTs");
-  const nftContract = await NFTContractFactory.deploy(DEOD_TOKEN_ADDRESS);
-
-  await nftContract.deployed();
-
-  console.log("DecentrawoodAI_NFTs deployed to:", nftContract.address);
+  // Set Depositor as deployer in NFT contract
+  const tx = await nft.setDeployer(depositor.address);
+  await tx.wait();
+  console.log("Depositor set as deployer in NFT contract");
 }
 
 main().catch((error) => {
   console.error(error);
-  process.exitCode = 1;
+  process.exit(1);
 });
